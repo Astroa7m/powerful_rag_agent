@@ -1,33 +1,24 @@
 from langchain_core.prompts import PromptTemplate
 from langchain_groq import ChatGroq
-from langchain_community.utilities import SQLDatabase
-from langchain.agents.agent_toolkits.sql.base import create_sql_agent
-from langchain.agents.agent_types import AgentType
+from langchain_community.utilities.sql_database import SQLDatabase
+from langchain_community.agent_toolkits.sql.toolkit import SQLDatabaseToolkit
+from langgraph.prebuilt import create_react_agent
 
 # Step 1: Connect to the SQLite database
 db = SQLDatabase.from_uri("sqlite:///university.db")
 
 # Step 2: Initialize ChatGroq with custom system prompt via Chat model
 llm = ChatGroq(
-        model_name="llama3-70b-8192",
+    model_name="llama3-70b-8192",
     temperature=0,
     groq_api_key="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",
 )
 
-prompt_message = """
-You are an expert data assistant working with a university database. 
-When answering questions, you must:
-- Use SQL queries with fuzzy logic: use LIKE, LOWER(), and wildcards where possible.
-- Always consider synonyms, alternate phrasing, and common typos (e.g. 'AI', 'A.I.', 'Artificial Intelligence', 'Machine Learning').
-- Search across all relevant columns in any table — not just one.
-- Avoid strict equality (=) unless you are certain the match is exact.
-- Prefer partial matches using LIKE or CONTAINS.
-- Provide thoughtful and accurate responses, even if you must search multiple fields.
+# Step 3: Create SQL toolkit and agent
+toolkit = SQLDatabaseToolkit(db=db, llm=llm)
 
-Be smart about schema usage and try to match intent, not just keywords.
-
-"""
-custom_prefix = """You are an expert SQL assistant that helps users query a university database.
+# Get system message from a template or use a default one
+system_prompt = """You are an expert SQL assistant that helps users query a university database.
 For the given database, analyze the user's question, create appropriate SQL queries, and provide clear answers.
 Always show your reasoning step by step.
 
@@ -166,13 +157,13 @@ When answering questions, you must:
 
 Be smart about schema usage and try to match intent, not just keywords.
 """
-# Step 3: Create a custom SQL agent
-agent_executor = create_sql_agent(
-    llm=llm,
-    db=db,
-    agent_type=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
-    verbose=True,
-    prefix=custom_prefix
+
+# Create agent using langgraph's create_react_agent
+agent_executor = create_react_agent(
+    model=llm,
+    tools=toolkit.get_tools(),
+    state_modifier=system_prompt,
+    debug=True,  # Enable verbose output,
 )
 
 # Step 4: Run a test question
@@ -183,5 +174,17 @@ TEST QUERIES
 -List Passed Tutors and the Modules They Teach
 -List Full-time Learning Fees by Major
 """
-response = agent_executor.run("Can you list all the tutors that teach modules along with what they teach and their title?")
-print("\n🤖 Answer:\n", response)
+
+
+def query_database(question):
+    # Execute the agent with the given question
+    response = agent_executor.invoke({"messages": [("user", question)]})
+    # Extract the last message from the response
+    return response["messages"][-1].content
+
+
+# Example usage
+if __name__ == "__main__":
+    response = query_database(
+        "Can you list all the tutors that teach modules along with what they teach and their title?")
+    print("\n🤖 Answer:\n", response)
