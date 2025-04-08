@@ -12,7 +12,7 @@ csv_files = {
     "OpenLearningFees": "OpenLearningFees.csv",
     "FoundationProgramFees": "FoundationProgramFees.csv",
     "NonRefundableEnrollmentFees": "NonRefundableEnrollmentFees.csv",
-    "PassedTutor": "PassedTutor.csv",
+    "PassTutor": "PassTutor.csv",
 }
 
 # ===== STEP 2: Load CSV files into DataFrames =====
@@ -47,7 +47,7 @@ conn.commit()
 
 # ===== STEP 6: Sample Queries (optional testing) =====
 sample_queries = [
-    ("All AI-specialized tutors:", "SELECT name, specialization FROM AcademicStaff WHERE specialization LIKE '%AI%' OR specialization LIKE '%Artificial Intelligence%' OR biography LIKE %Artificial Intelligence%;"),
+    ("All AI-specialized tutors:", "SELECT name, specialization FROM AcademicStaff WHERE specialization LIKE '%AI%' OR specialization LIKE '%Artificial Intelligence%' OR biography LIKE '%Artificial Intelligence%';"),
     ("Email of Dr. Sherimon:", "SELECT name, email FROM AcademicStaff WHERE name LIKE '%Sherimon%';"),
     ("Open Learning Fees by Major:", "SELECT * FROM OpenLearningFees;")
 ]

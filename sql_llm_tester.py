@@ -5,11 +5,11 @@ from langchain.agents.agent_toolkits.sql.base import create_sql_agent
 from langchain.agents.agent_types import AgentType
 
 # Step 1: Connect to the SQLite database
-db = SQLDatabase.from_uri("sqlite:///aou_rag.db")
+db = SQLDatabase.from_uri("sqlite:///university.db")
 
 # Step 2: Initialize ChatGroq with custom system prompt via Chat model
 llm = ChatGroq(
-        model_name="llama-3.3-70b-versatile",
+        model_name="llama3-70b-8192",
     temperature=0,
     groq_api_key="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",
 )
@@ -37,5 +37,12 @@ agent_executor = create_sql_agent(
 )
 
 # Step 4: Run a test question
-response = agent_executor.run("Who are the academic staff involved in artificial intelligence or machine learning?")
+"""
+TEST QUERIES
+-List Academic Staff and the Modules They Teach
+-List Faculties and Their Head of Faculty
+-List Passed Tutors and the Modules They Teach
+-List Full-time Learning Fees by Major
+"""
+response = agent_executor.run("List Full-time Learning Fees by Major")
 print("\n🤖 Answer:\n", response)
