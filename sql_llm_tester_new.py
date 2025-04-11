@@ -183,8 +183,17 @@ def query_database(question):
     return response["messages"][-1].content
 
 
+# Add a post-processing function to ensure execution if needed
+def ensure_execution(question):
+    response = query_database(question)
+    # If the response appears to be just SQL without results, try again with a more explicit prompt
+    if "select" in response.lower() and "from" in response.lower():
+        print(f"\n\nTHE GOTTEN RESPONSE\n\n{response}")
+        follow_up = f"Please execute the SQL query you provided and show the results for {response}"
+        return query_database(follow_up)
+    return response
+
 # Example usage
 if __name__ == "__main__":
-    response = query_database(
-        "Can you list all the tutors that teach modules along with what they teach and their title?")
+    response = ensure_execution("List all the faculty members who are in computer studies")
     print("\n🤖 Answer:\n", response)
