@@ -52,7 +52,7 @@ def insert_fee_rows(rows):
 # --------------------------------------------
 # Step 4: Process FoundationProgramFees.csv
 # --------------------------------------------
-foundation = pd.read_csv("../csv/FoundationProgramFees.csv")
+foundation = pd.read_csv("../data/csv/FoundationProgramFees.csv")
 foundation_rows = [
     (
         str(uuid.uuid4()),            # id
@@ -70,7 +70,7 @@ insert_fee_rows(foundation_rows)
 # --------------------------------------------
 # Step 5: Process FullTimeLearningFees.csv
 # --------------------------------------------
-fulltime = pd.read_csv("../csv/FullTimeLearningFees.csv")
+fulltime = pd.read_csv("../data/csv/FullTimeLearningFees.csv")
 fulltime_rows = []
 for row in fulltime.itertuples(index=False):
     major_id = str(row[1]).strip()
@@ -91,7 +91,7 @@ insert_fee_rows(fulltime_rows)
 # --------------------------------------------
 # Step 6: Process OpenLearningFees.csv
 # --------------------------------------------
-openlearn = pd.read_csv("../csv/OpenLearningFees.csv")
+openlearn = pd.read_csv("../data/csv/OpenLearningFees.csv")
 openlearn_rows = []
 for row in openlearn.itertuples(index=False):
     major_id = str(row[1]).strip()
@@ -112,7 +112,7 @@ insert_fee_rows(openlearn_rows)
 # --------------------------------------------
 # Step 7: Process NonRefundableEnrollmentFees.csv
 # --------------------------------------------
-enroll = pd.read_csv("../csv/NonRefundableEnrollmentFees.csv")
+enroll = pd.read_csv("../data/csv/NonRefundableEnrollmentFees.csv")
 enrollment_rows = [
     (
         str(uuid.uuid4()),

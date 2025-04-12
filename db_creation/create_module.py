@@ -11,7 +11,7 @@ import sqlite3
 import pandas as pd
 
 # Load the Module CSV
-df = pd.read_csv("../csv/Module.csv")
+df = pd.read_csv("../data/csv/Module.csv")
 
 # Optional cleanup: strip whitespace and cast
 df["code"] = df["code"].astype(str).str.strip()

@@ -12,7 +12,7 @@ import sqlite3
 import pandas as pd
 
 # Load the CSV
-df = pd.read_csv("../csv/PassTutor.csv")
+df = pd.read_csv("../data/csv/PassTutor.csv")
 
 # Clean up
 df["id"] = df["id"].astype(str).str.strip()

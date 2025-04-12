@@ -10,7 +10,7 @@ import sqlite3
 import pandas as pd
 
 # Load FAQ CSV
-df = pd.read_csv("../csv/FAQ.csv")
+df = pd.read_csv("../data/csv/FAQ.csv")
 
 # Optional cleanup
 df["id"] = df["id"].astype(str).str.strip()

@@ -5,7 +5,7 @@ from langchain_groq import ChatGroq
 
 # === Step 1: Load the vectorstore ===
 embedding_model = HuggingFaceEmbeddings(model_name="thenlper/gte-small")
-vectorstore = FAISS.load_local("aou_faiss_index", embedding_model, allow_dangerous_deserialization=True)
+vectorstore = FAISS.load_local("vector_store_faq_and_general_info/aou_faq_vectorstore", embedding_model, allow_dangerous_deserialization=True)
 
 # === Step 2: Initialize the retriever ===
 retriever = vectorstore.as_retriever(search_type="similarity", search_kwargs={"k": 5})
@@ -26,14 +26,18 @@ qa_chain = RetrievalQA.from_chain_type(
 )
 
 # === Step 5: Ask your question ===
-query = "Who teaches artificial intelligence or machine learning?"
-response = qa_chain(query)
+query = input("Q: ")
 
-# === Step 6: Print answer and (optional) sources ===
-print("\n🤖 Answer:")
-print(response["result"])
+while query != "-1":
+    response = qa_chain(query)
 
-print("\n📄 Retrieved Chunks (for transparency):")
-for doc in response["source_documents"]:
-    print("---")
-    print(doc.page_content)
+    # === Step 6: Print answer and (optional) sources ===
+    print("\n🤖 Answer:")
+    print(response["result"])
+
+    print("\n📄 Retrieved Chunks (for transparency):")
+    for doc in response["source_documents"]:
+        print("---")
+        print(doc.page_content)
+    query = input("Q: ")
+

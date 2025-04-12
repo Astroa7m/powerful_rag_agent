@@ -11,7 +11,7 @@ import sqlite3
 import pandas as pd
 
 # Load Faculty CSV
-df = pd.read_csv("../csv/Faculty.csv")
+df = pd.read_csv("../data/csv/Faculty.csv")
 
 # Optional cleanup
 df["id"] = df["id"].astype(str).str.strip()

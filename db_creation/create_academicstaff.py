@@ -14,7 +14,7 @@ import sqlite3
 import pandas as pd
 
 # Load the AcademicStaff CSV
-df = pd.read_csv("../csv/AcademicStaff.csv")
+df = pd.read_csv("../data/csv/AcademicStaff.csv")
 
 # Normalize the teaches column into a new dataframe
 teaches_data = []
