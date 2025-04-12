@@ -7,3 +7,7 @@ Create the tables in this order, or run the files in this order:
 6 - Create Pass Tutor
 7 - Create Fees
 8 - Create FAQ
+
+
+
+Note: There is an externally add col for academic staff to link them to faculty called faculty_id

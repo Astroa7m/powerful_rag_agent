@@ -1,12 +1,13 @@
+from langchain_community.vectorstores import FAISS
 from langchain_core.prompts import PromptTemplate
 from langchain_groq import ChatGroq
 from langchain_community.utilities.sql_database import SQLDatabase
 from langchain_community.agent_toolkits.sql.toolkit import SQLDatabaseToolkit
+from langchain_huggingface import HuggingFaceEmbeddings
 from langgraph.prebuilt import create_react_agent
 
 # Step 1: Connect to the SQLite database
 db = SQLDatabase.from_uri("sqlite:///university.db")
-
 # Step 2: Initialize ChatGroq with custom system prompt via Chat model
 llm = ChatGroq(
     model_name="llama3-70b-8192",
@@ -146,14 +147,16 @@ Common query patterns:
 
 When answering questions, you must:
 - Handle bilingual queries by searching in both English and Arabic fields
-- Use SQL queries with fuzzy logic: use LIKE, LOWER(), and wildcards where possible
+- Use SQL queries with fuzzy logic: use LIKE, LOWER() every time to avoid case mismatch 
 - Always consider synonyms, alternate phrasing, and common typos
+- When any name is asked about, split the name if words> 1 and increase the search possibility by querying with LIKE for each split
 - Search across all relevant columns in any table — not just one
 - Avoid strict equality (=) unless you are certain the match is exact
 - Prefer partial matches using LIKE or CONTAINS
 - Provide thoughtful and accurate responses, even if you must search multiple fields
 - When asked about tutor or any synonym close to tutor you must think of Academic Staff not Pass Tutor
 - If asked about student Tutor or Pass tutor then use Pass tutor
+- When asked about IT, ITC, Programming, اي تي, information technology faculty, you should use 'computer' to query. 
 
 Be smart about schema usage and try to match intent, not just keywords.
 """
@@ -183,17 +186,98 @@ def query_database(question):
     return response["messages"][-1].content
 
 
-# Add a post-processing function to ensure execution if needed
-def ensure_execution(question):
-    response = query_database(question)
-    # If the response appears to be just SQL without results, try again with a more explicit prompt
-    if "select" in response.lower() and "from" in response.lower():
-        print(f"\n\nTHE GOTTEN RESPONSE\n\n{response}")
-        follow_up = f"Please execute the SQL query you provided and show the results for {response}"
-        return query_database(follow_up)
-    return response
 
+import re
+import sqlite3
+
+import re
+
+
+def extract_sql_block(text: str):
+    """
+    Extracts SQL from either:
+    - a code block marked with ```sql
+    - or after the first line that starts with 'SQL:'
+    """
+    # Try extracting from code block
+    match = re.search(r"```sql(.*?)```", text, re.DOTALL | re.IGNORECASE)
+    if match:
+        return match.group(1).strip()
+
+    # Fallback: Look for 'SQL:' inline
+    match = re.search(r"SQL\s*:\s*(SELECT .*?;)", text, re.DOTALL | re.IGNORECASE)
+    if match:
+        return match.group(1).strip()
+
+    # Try more aggressively if needed (less strict)
+    match = re.search(r"(SELECT\s+.*?;)", text, re.DOTALL | re.IGNORECASE)
+    return match.group(1).strip() if match else None
+
+
+def run_sql(sql_query: str, db_path="university.db"):
+    """Executes SQL on your database and returns tabular result as string."""
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute(sql_query)
+        rows = cursor.fetchall()
+        columns = [desc[0] for desc in cursor.description]
+
+        result = "\n".join([", ".join(map(str, row)) for row in rows])
+        if not result:
+            result = "[No rows found.]"
+        return f"{' | '.join(columns)}\n{result}"
+    except Exception as e:
+        return f"[SQL Execution Error] {e}"
+    finally:
+        conn.close()
+
+# Add a post-processing function to ensure execution if needed
+def ensure_execution(question: str):
+    # Step 1: Use your agent to get the SQL or reasoning
+    response = query_database(question)
+
+    # Step 2: Try to extract SQL from the response
+    sql_code = extract_sql_block(response)
+
+    if sql_code:
+        print("🔍 SQL extracted:\n", sql_code)
+        # Step 3: Run the actual SQL
+        sql_result = run_sql(sql_code)
+        print("📊 Actual SQL Result:\n", sql_result)
+
+        # Step 4: Return final response with real DB output
+        return f"{response.strip()}\n\n📊 Actual Results:\n{sql_result}"
+
+    else:
+        print("⚠️ No SQL detected, returning original response.")
+        return response
+
+
+def load_sql_vectorstore(path="vector_store_to_sql_gen/query_vector_index"):
+    """Loads the FAISS vectorstore for query-to-sql pairs."""
+    embedding = HuggingFaceEmbeddings(model_name="thenlper/gte-small")
+    return FAISS.load_local(path, embedding, allow_dangerous_deserialization=True)
+
+
+def build_prompt_with_top_k_sql(user_question, vectorstore=load_sql_vectorstore(), k=5):
+    """
+    Retrieve top-K SQL examples and combine them with the original question.
+    """
+    retrieved = vectorstore.similarity_search(user_question, k=k)
+
+    examples = "\n\n".join(
+        f"Q: {doc.page_content}\nSQL: {doc.metadata['sql']}" for doc in retrieved
+    )
+
+    final_prompt = (
+        f"{examples}\n\n"
+        f"User Question: {user_question}\nSQL:"
+    )
+    print("Final user prompt", final_prompt)
+    return final_prompt
 # Example usage
 if __name__ == "__main__":
-    response = ensure_execution("List all the faculty members who are in computer studies")
+    response = ensure_execution(build_prompt_with_top_k_sql("List all the teacher of it faculty"))
     print("\n🤖 Answer:\n", response)
