@@ -4,8 +4,8 @@
     "sql": "SELECT a.name FROM AcademicStaff a JOIN Teaches t ON a.id = t.staff_id WHERE LOWER(t.module_code) LIKE '%TM112%';"
   },
   {
-    "query": "Which academic staff is responsible for teaching the module TM112?",
-    "sql": "SELECT a.name FROM AcademicStaff a JOIN Teaches t ON a.id = t.staff_id WHERE LOWER(t.module_code) LIKE '%TM112%';"
+    "query": "Which academic staff is responsible for teaching the module 112?",
+    "sql": "SELECT a.name FROM AcademicStaff a JOIN Teaches t ON a.id = t.staff_id WHERE LOWER(t.module_code) LIKE '%112%';"
   },
   {
     "query": "List the names of staff teaching TM112",
@@ -13,11 +13,11 @@
   },
   {
     "query": "Who specializes in artificial intelligence?",
-    "sql": "SELECT name FROM AcademicStaff WHERE LOWER(specialization)) LIKE '%artificial intelligence%';"
+    "sql": "SELECT name FROM AcademicStaff WHERE LOWER(specialization) LIKE '%artificial intelligence%';"
   },
   {
     "query": "Which staff have AI listed in their specialization?",
-    "sql": "SELECT name FROM AcademicStaff WHERE LOWER(specialization)) LIKE '%ai%';"
+    "sql": "SELECT name FROM AcademicStaff WHERE LOWER(specialization) LIKE '%ai%';"
   },
   {
     "query": "What is Dr. Aisha's biography?",
@@ -31,7 +31,7 @@
     "query": "Who is the head of the ITC faculty?",
     "sql": "SELECT a.name FROM Faculty f JOIN AcademicStaff a ON f.HeadOfFaculty = a.id WHERE LOWER(f.name) LIKE '%computer%';"
   },
-    {
+  {
     "query": "من يدرّس المقرر TM112؟",
     "sql": "SELECT a.name FROM AcademicStaff a JOIN Teaches t ON a.id = t.staff_id WHERE LOWER(t.module_code) LIKE '%TM112%';"
   },
@@ -69,11 +69,11 @@
   },
   {
     "query": "Which modules are about data science?",
-    "sql": "SELECT name FROM Module WHERE LOWER(name)) LIKE '%data science%' OR LOWER(description)) LIKE '%data science%' OR LOWER(objectives)) LIKE '%data science%';"
+    "sql": "SELECT name FROM Module WHERE LOWER(name) LIKE '%data science%' OR LOWER(description) LIKE '%data science%' OR LOWER(objectives) LIKE '%data science%';"
   },
   {
     "query": "Give me modules focused on machine learning",
-    "sql": "SELECT name FROM Module WHERE LOWER(objectives)) LIKE '%machine learning%' OR LOWER(description)) LIKE '%machine learning%';"
+    "sql": "SELECT name FROM Module WHERE LOWER(objectives) LIKE '%machine learning%' OR LOWER(description) LIKE '%machine learning%';"
   },
   {
     "query": "What does TM260 teach?",
@@ -89,17 +89,17 @@
   },
   {
     "query": "Find all tutors for TM355",
-    "sql": "SELECT pt.name FROM PassTutor pt JOIN PassTutorTeachingModule ptm ON pt.id = ptm.tutor_id WHERE LOWER(ptm.module_code) LIKE '%TM355%';"
+    "sql": "SELECT name FROM AcademicStaff WHERE id IN (SELECT staff_id FROM Teaches WHERE LOWER(module_code) LIKE '%tm355%') UNION SELECT name FROM PassTutor WHERE id IN (SELECT tutor_id FROM PassTutorTeachingModule WHERE LOWER(module_code) LIKE '%tm355%');"
   },
   {
     "query": "Which tutor teaches M132?",
-    "sql": "SELECT pt.name FROM PassTutor pt JOIN PassTutorTeachingModule ptm ON pt.id = ptm.tutor_id WHERE LOWER(ptm.module_code) LIKE '%M132%';"
+    "sql": "SELECT a.name FROM AcademicStaff a JOIN Teaches t ON a.id = t.staff_id WHERE LOWER(t.module_code) LIKE '%m132%';"
   },
   {
     "query": "How much is the full-time fee for Design majors?",
     "sql": "SELECT f.amount FROM Fee f JOIN Major m ON f.major_id = m.id WHERE LOWER(m.name) LIKE '%Design%';"
   },
-    {
+  {
     "query": "ما هي أسماء رؤساء الكليات؟",
     "sql": "SELECT f.name AS faculty, a.name AS head FROM Faculty f JOIN AcademicStaff a ON f.HeadOfFaculty = a.id;"
   },
@@ -125,27 +125,23 @@
   },
   {
     "query": "من هم المدرسون الذين يدرّسون المقرر TM355؟",
-    "sql": "SELECT pt.name FROM PassTutor pt JOIN PassTutorTeachingModule ptm ON pt.id = ptm.tutor_id WHERE LOWER(ptm.module_code) LIKE '%TM355%';"
+    "sql": "SELECT name FROM AcademicStaff WHERE id IN (SELECT staff_id FROM Teaches WHERE LOWER(module_code) LIKE '%tm355%') UNION SELECT name FROM PassTutor WHERE id IN (SELECT tutor_id FROM PassTutorTeachingModule WHERE LOWER(module_code) LIKE '%tm355%');"
   },
   {
     "query": "من يدرّس المقرر M132؟",
-    "sql": "SELECT pt.name FROM PassTutor pt JOIN PassTutorTeachingModule ptm ON pt.id = ptm.tutor_id WHERE LOWER(ptm.module_code) LIKE '%M132%';"
+    "sql": "SELECT a.name FROM AcademicStaff a JOIN Teaches t ON a.id = t.staff_id WHERE LOWER(t.module_code) LIKE '%m132%';"
   },
   {
     "query": "كم تبلغ رسوم الدراسة الكاملة لتخصص التصميم؟",
-    "sql": "SELECT f.amount FROM Fee f JOIN Major m ON f.major_id = m.id WHERE LOWER(m.name) LIKE '%Design%';"
+    "sql": "SELECT f.amount, m.name FROM Fee f JOIN Major m ON f.major_id = m.id WHERE LOWER(m.name) LIKE '%Design%';"
   },
   {
-    "query": "What is the cost of foundation program for online learning?",
-    "sql": "SELECT amount FROM Fee WHERE LOWER(MethodOfDelivery)) LIKE '%online%';"
+    "query": "What is the cost of foundation program for open learning?",
+    "sql": "SELECT amount FROM Fee WHERE LOWER(MethodOfDelivery) LIKE '%openlearning%';"
   },
   {
     "query": "Show open learning fees for IT majors",
-    "sql": "SELECT o.amount FROM Fee o JOIN Major m ON o.major_id = m.id WHERE LOWER(m.name) LIKE '%com%';"
-  },
-  {
-    "query": "List non-refundable enrollment fees",
-    "sql": "SELECT FeeType, Amount FROM NonRefundableEnrollmentFees;"
+    "sql": "SELECT o.amount, m.name FROM Fee o JOIN Major m ON o.major_id = m.id JOIN Faculty f ON m.offeredByFaculty = f.id WHERE LOWER(o.feeType) LIKE '%openlearning%' AND LOWER(f.name) LIKE '%computer%';"
   },
   {
     "query": "Where can I find the answer to how to register for courses?",
@@ -156,8 +152,8 @@
     "sql": "SELECT module_code FROM Teaches GROUP BY module_code HAVING COUNT(DISTINCT staff_id) > 1;"
   },
   {
-    "query": "What majors have a degree level of Bachelor?",
-    "sql": "SELECT name FROM Major WHERE LOWER(degreeLevel) LIKE '%Bachelor%';"
+    "query": "What majors are considered bachelor?",
+    "sql": "SELECT name FROM Major WHERE LOWER(name) NOT LIKE '%diploma%' AND LOWER(name) NOT LIKE '%master%';"
   },
   {
     "query": "Get all objectives for TM355",
@@ -165,7 +161,7 @@
   },
   {
     "query": "List all modules with the word 'network' in their name or description",
-    "sql": "SELECT name FROM Module WHERE LOWER(name)) LIKE '%network%' OR LOWER(description)) LIKE '%network%';"
+    "sql": "SELECT name FROM Module WHERE LOWER(name) LIKE '%network%' OR LOWER(description) LIKE '%network%';"
   },
   {
     "query": "Show the email of tutors who teach TM355",
@@ -173,7 +169,7 @@
   },
   {
     "query": "Find all academic staff who teach any module related to cybersecurity.",
-    "sql": "SELECT DISTINCT a.name FROM AcademicStaff a JOIN Teaches t ON a.id = t.staff_id JOIN Module m ON m.code = t.module_code WHERE LOWER(m.name)) LIKE '%cybersecurity%' OR LOWER(m.description)) LIKE '%cybersecurity%';"
+    "sql": "SELECT DISTINCT a.name FROM AcademicStaff a JOIN Teaches t ON a.id = t.staff_id JOIN Module m ON m.code = t.module_code WHERE LOWER(m.name) LIKE '%cybersecurity%' OR LOWER(m.description) LIKE '%cybersecurity%';"
   },
   {
     "query": "Which modules are taught by Dr. Khalid?",
@@ -188,16 +184,12 @@
     "sql": "SELECT name FROM AcademicStaff WHERE LOWER(title) LIKE '%Associate Professor%';"
   },
   {
-    "query": "ما تكلفة برنامج التأسيس للتعلم عبر الإنترنت؟",
-    "sql": "SELECT amount FROM Fee WHERE LOWER(MethodOfDelivery) LIKE '%online%';"
+    "query": "ما تكلفة برنامج التأسيس للتعلم المفتوح؟",
+    "sql": "SELECT amount FROM Fee WHERE LOWER(MethodOfDelivery) LIKE '%openlearning%';"
   },
   {
     "query": "أعرض رسوم التعلم المفتوح لتخصص تكنولوجيا المعلومات",
-    "sql": "SELECT o.amount FROM Fee o JOIN Major m ON o.major_id = m.id WHERE LOWER(m.name) LIKE '%IT%';"
-  },
-  {
-    "query": "ما هي رسوم التسجيل غير القابلة للاسترداد؟",
-    "sql": "SELECT FeeType, Amount FROM NonRefundableEnrollmentFees;"
+    "sql": "SELECT o.amount, m.name FROM Fee o JOIN Major m ON o.major_id = m.id JOIN Faculty f ON m.offeredByFaculty = f.id WHERE LOWER(o.feeType) LIKE '%openlearning%' AND LOWER(f.name) LIKE '%computer%';"
   },
   {
     "query": "أين يمكنني العثور على إجابة حول كيفية تسجيل المقررات؟",
@@ -209,7 +201,7 @@
   },
   {
     "query": "ما هي التخصصات التي تحمل درجة البكالوريوس؟",
-    "sql": "SELECT name FROM Major WHERE LOWER(degreeLevel) LIKE '%Bachelor%';"
+    "sql": "SELECT name FROM Major WHERE LOWER(name) NOT LIKE '%diploma%' AND LOWER(name) NOT LIKE '%master%';"
   },
   {
     "query": "ما هي أهداف المقرر TM355؟",
@@ -252,8 +244,8 @@
     "sql": "SELECT name, prerequisite FROM Module;"
   },
   {
-    "query": "Show all tutors who belong to the IT major.",
-    "sql": "SELECT pt.name FROM PassTutor pt JOIN Major m ON pt.major = m.id WHERE LOWER(m.name) LIKE '%IT%';"
+    "query": "Show all pass tutors/tutorial mister who belong to the ITC major.",
+    "sql": "SELECT pt.name FROM PassTutor pt JOIN Major m ON pt.major = m.id WHERE LOWER(m.name) LIKE '%ITC%';"
   },
   {
     "query": "List all module codes and names offered by the Faculty of Business.",
@@ -264,8 +256,8 @@
     "sql": "SELECT a.email FROM AcademicStaff a JOIN Teaches t ON a.id = t.staff_id WHERE LOWER(t.module_code) LIKE '%TM260%';"
   },
   {
-    "query": "Which tutors teach more than one module?",
-    "sql": "SELECT tutor_id FROM PassTutorTeachingModule GROUP BY tutor_id HAVING COUNT(DISTINCT module_code) > 1;"
+    "query": "Which pass tutors/tutorial mister teach more than one module?",
+    "sql": "SELECT ptt.tutor_id, t.name FROM PassTutorTeachingModule ptt JOIN PassTutor t ON ptt.tutor_id = t.id  GROUP BY ptt.tutor_id HAVING COUNT(DISTINCT module_code) > 1;"
   },
   {
     "query": "Give me all module names that start with 'TM'.",
@@ -273,14 +265,14 @@
   },
   {
     "query": "Find all FAQs that contain the word 'exam'.",
-    "sql": "SELECT question, answer FROM FAQ WHERE LOWER(question)) LIKE '%exam%' OR LOWER(answer)) LIKE '%exam%';"
+    "sql": "SELECT question, answer FROM FAQ WHERE LOWER(question) LIKE '%exam%' OR LOWER(answer) LIKE '%exam%';"
   },
   {
     "query": "Get all academic staff who do not teach any modules.",
     "sql": "SELECT name FROM AcademicStaff WHERE LOWER(id NOT IN (SELECT DISTINCT staff_id FROM Teaches);"
   },
   {
-    "query": "Show all tutors and their associated majors.",
+    "query": "Show all pass tutors/tutorial mister and their associated majors.",
     "sql": "SELECT pt.name, m.name AS major FROM PassTutor pt JOIN Major m ON pt.major = m.id;"
   },
   {
@@ -289,7 +281,7 @@
   },
   {
     "query": "Show module names where objectives include 'teamwork'.",
-    "sql": "SELECT name FROM Module WHERE LOWER(objectives)) LIKE '%teamwork%';"
+    "sql": "SELECT name FROM Module WHERE LOWER(objectives) LIKE '%teamwork%';"
   },
   {
     "query": "Give me all full-time fee records along with major names.",
@@ -305,7 +297,7 @@
   },
   {
     "query": "Which majors offer modules with 'AI' in the title or objectives?",
-    "sql": "SELECT DISTINCT mj.name FROM Major mj JOIN Faculty f ON mj.offeredByFaculty = f.id JOIN Module m ON m.offeredByFaculty = f.id WHERE LOWER(m.name)) LIKE '%ai%' OR LOWER(m.objectives)) LIKE '%ai%';"
+    "sql": "SELECT DISTINCT mj.name FROM Major mj JOIN Faculty f ON mj.offeredByFaculty = f.id JOIN Module m ON m.offeredByFaculty = f.id WHERE LOWER(m.name) LIKE '%ai%' OR LOWER(m.objectives) LIKE '%ai%';"
   },
   {
     "query": "Which faculty offers TM260 and who is the head of that faculty?",
@@ -313,7 +305,7 @@
   },
   {
     "query": "List all modules related to programming offered by the IT faculty.",
-    "sql": "SELECT m.name FROM Module m JOIN Faculty f ON m.offeredByFaculty = f.id WHERE LOWER(f.name) LIKE '%IT%' AND (LOWER(m.name)) LIKE '%programming%' OR LOWER(m.description)) LIKE '%programming%' OR LOWER(m.objectives)) LIKE '%programming%');"
+    "sql": "SELECT m.name FROM Module m JOIN Faculty f ON m.offeredByFaculty = f.id WHERE LOWER(f.name) LIKE '%IT%' AND (LOWER(m.name) LIKE '%programming%' OR LOWER(m.description) LIKE '%programming%' OR LOWER(m.objectives) LIKE '%programming%');"
   },
   {
     "query": "Which tutors teach modules from the Business faculty?",
@@ -329,7 +321,7 @@
   },
   {
     "query": "Which modules list teamwork in outcomes or objectives?",
-    "sql": "SELECT name FROM Module WHERE LOWER(objectives)) LIKE '%teamwork%' OR LOWER(outcomes)) LIKE '%teamwork%';"
+    "sql": "SELECT name FROM Module WHERE LOWER(objectives) LIKE '%teamwork%' OR LOWER(outcomes) LIKE '%teamwork%';"
   },
   {
     "query": "Show all modules and the major associated with their faculty.",
@@ -341,11 +333,11 @@
   },
   {
     "query": "How much would a Design student pay for foundation program online delivery?",
-    "sql": "SELECT f.amount FROM Fee f JOIN Major m ON f.major_id = m.id WHERE LOWER(m.name) LIKE '%Design%' AND LOWER(f.MethodOfDelivery)) LIKE '%online%';"
+    "sql": "SELECT f.amount FROM Fee f JOIN Major m ON f.major_id = m.id WHERE LOWER(m.name) LIKE '%Design%' AND LOWER(f.MethodOfDelivery) LIKE '%online%';"
   },
   {
     "query": "List all frequently asked questions related to course registration.",
-    "sql": "SELECT question, answer FROM FAQ WHERE LOWER(question)) LIKE '%register%' OR LOWER(answer)) LIKE '%register%';"
+    "sql": "SELECT question, answer FROM FAQ WHERE LOWER(question) LIKE '%register%' OR LOWER(answer) LIKE '%register%';"
   },
   {
     "query": "Which major has no tutors assigned?",
@@ -383,7 +375,7 @@
     "query": "Find all tutors whose major is not linked to any full-time learning fees.",
     "sql": "SELECT pt.name FROM PassTutor pt WHERE LOWER(pt.major NOT IN (SELECT DISTINCT major_id FROM Fee);"
   },
-    {
+  {
     "query": "اعرض أسماء وبريد أعضاء هيئة التدريس الذين يحملون منصب 'منسق'.",
     "sql": "SELECT name, email FROM AcademicStaff WHERE LOWER(position) LIKE '%Coordinator%';"
   },
@@ -396,8 +388,8 @@
     "sql": "SELECT name, prerequisite FROM Module;"
   },
   {
-    "query": "ما أسماء المدرسين التابعين لتخصص تكنولوجيا المعلومات؟",
-    "sql": "SELECT pt.name FROM PassTutor pt JOIN Major m ON pt.major = m.id WHERE LOWER(m.name) LIKE '%IT%';"
+    "query": "ما أسماء المدرسين الطلاب/الخاصين بالتتوريال التابعين لتخصص تكنولوجيا المعلومات؟",
+    "sql": "SELECT pt.name FROM PassTutor pt JOIN Major m ON pt.major = m.id WHERE LOWER(m.name) LIKE '%ITC%';"
   },
   {
     "query": "اعرض رموز وأسماء المقررات المقدمة من كلية الأعمال.",
@@ -408,8 +400,8 @@
     "sql": "SELECT a.email FROM AcademicStaff a JOIN Teaches t ON a.id = t.staff_id WHERE LOWER(t.module_code) LIKE '%TM260%';"
   },
   {
-    "query": "من هم المدرسون الذين يدرّسون أكثر من مقرر واحد؟",
-    "sql": "SELECT tutor_id FROM PassTutorTeachingModule GROUP BY tutor_id HAVING COUNT(DISTINCT module_code) > 1;"
+    "query": "من هم المدرسون الطلاب/الخاصين بالتتوريال الذين يدرّسون أكثر من مقرر واحد؟",
+    "sql": "SELECT ptt.tutor_id, t.name FROM PassTutorTeachingModule ptt JOIN PassTutor t ON ptt.tutor_id = t.id  GROUP BY ptt.tutor_id HAVING COUNT(DISTINCT module_code) > 1;"
   },
   {
     "query": "اعطني أسماء المقررات التي تبدأ بـ 'TM'.",
@@ -424,7 +416,7 @@
     "sql": "SELECT name FROM AcademicStaff WHERE id NOT IN (SELECT DISTINCT staff_id FROM Teaches);"
   },
   {
-    "query": "اعرض جميع المدرسين والتخصصات المرتبطين بها.",
+    "query": "اعرض جميع المدرسين الطلاب/الخاصين بالتتوريال والتخصصات المرتبطين بها.",
     "sql": "SELECT pt.name, m.name AS major FROM PassTutor pt JOIN Major m ON pt.major = m.id;"
   },
   {
@@ -602,5 +594,13 @@
   {
     "query": "اعثر على أعضاء هيئة التدريس في الكليات التي تحتوي أسماؤها على 'إدارة'.",
     "sql": "SELECT a.name FROM AcademicStaff a JOIN Faculty f ON a.faculty_id = f.id WHERE LOWER(f.nameArabic) LIKE '%إدارة%';"
+  },
+  {
+    "query": "Who is Ahmed Samir?",
+    "sql": "SELECT name, 'AcademicStaff' AS source FROM AcademicStaff \nWHERE LOWER(name) LIKE '%ahmed%' OR LOWER(name) LIKE '%samir%'\nUNION\nSELECT name, 'PassTutor' AS source FROM PassTutor \nWHERE LOWER(name) LIKE '%ahmed%' OR LOWER(name) LIKE '%samir%';"
+  },
+  {
+    "query": "من هو احمد سمير؟",
+    "sql": "SELECT name, 'AcademicStaff' AS source FROM AcademicStaff \nWHERE LOWER(name) LIKE '%ahmed%' OR LOWER(name) LIKE '%samir%'\nUNION\nSELECT name, 'PassTutor' AS source FROM PassTutor \nWHERE LOWER(name) LIKE '%ahmed%' OR LOWER(name) LIKE '%samir%';"
   }
 ]

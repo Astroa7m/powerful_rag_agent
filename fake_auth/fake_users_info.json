@@ -1,0 +1,195 @@
+{
+  "users": [
+    {
+      "id": 200304,
+      "title": "",
+      "name": "Ahmed Samir",
+      "password": "200304",
+      "GPA": 3.87,
+      "academic_performance": {
+        "M110 - Python Programming": {
+          "midterm": "20/30",
+          "tutor_marked_assessment(TMA)": "15/15",
+          "attendance": "5/5",
+          "final": "45/50",
+          "total_mark": "85/100",
+          "grade": "B"
+        },
+        "TM105 - Java Programming": {
+          "midterm": "27/30",
+          "tutor_marked_assessment(TMA)": "15/15",
+          "attendance": "4.75/5",
+          "final": "46.25/50",
+          "total_mark": "93/100",
+          "grade": "A"
+        },
+        "TM354 - Software Engineering": {
+          "midterm": "26.5/30",
+          "tutor_marked_assessment(TMA)": "13.25/15",
+          "attendance": "4/5",
+          "final": "48/50",
+          "total_mark": "91.75/100",
+          "grade": "A"
+        },
+        "AR113 - Arabic Communication Skills": {
+          "midterm": "22/30",
+          "tutor_marked_assessment(TMA)": "11/15",
+          "attendance": "5/5",
+          "final": "39/50",
+          "total_mark": "77/100",
+          "grade": "C"
+        }
+      },
+      "schedule": {
+        "Monday": {
+          "09:00 - 10:30": "M110 - Python Programming (Lecture)",
+          "11:00 - 12:30": "TM105 - Java Programming (Lecture)",
+          "14:00 - 15:30": "TM354 - Software Engineering (Lecture)"
+        },
+        "Tuesday": {
+          "09:00 - 10:30": "AR113 - Arabic Communication Skills (Lecture)",
+          "11:00 - 12:30": "M110 - Python Programming (Lab)",
+          "14:00 - 15:30": "TM354 - Software Engineering (Lab)"
+        },
+        "Wednesday": {
+          "09:00 - 10:30": "TM105 - Java Programming (Lab)",
+          "11:00 - 12:30": "TM354 - Software Engineering (Tutorial)",
+          "14:00 - 15:30": "AR113 - Arabic Communication Skills (Tutorial)"
+        },
+        "Thursday": {
+          "09:00 - 10:30": "M110 - Python Programming (Lab)",
+          "11:00 - 12:30": "TM105 - Java Programming (Seminar)",
+          "14:00 - 15:30": "TM354 - Software Engineering (Seminar)"
+        },
+        "Friday": {
+          "09:00 - 12:00": "Office Hours/Consultations",
+          "12:30 - 14:00": "Departmental Meeting"
+        }
+      },
+      "role": "student"
+    },
+    {
+      "id": 190370,
+      "title": "",
+      "name": "Samaa Abdullah Alhasni",
+      "password": "190370",
+      "GPA": 3.65,
+      "academic_performance": {
+        "M110 - Python Programming": {
+          "midterm": "24/30",
+          "tutor_marked_assessment(TMA)": "13/15",
+          "attendance": "4.5/5",
+          "final": "42/50",
+          "total_mark": "83.5/100",
+          "grade": "B"
+        },
+        "TM105 - Java Programming": {
+          "midterm": "25/30",
+          "tutor_marked_assessment(TMA)": "14/15",
+          "attendance": "4.25/5",
+          "final": "44/50",
+          "total_mark": "87.25/100",
+          "grade": "B"
+        },
+        "TM354 - Software Engineering": {
+          "midterm": "23/30",
+          "tutor_marked_assessment(TMA)": "12/15",
+          "attendance": "5/5",
+          "final": "43/50",
+          "total_mark": "83/100",
+          "grade": "B"
+        },
+        "AR113 - Arabic Communication Skills": {
+          "midterm": "19/30",
+          "tutor_marked_assessment(TMA)": "10/15",
+          "attendance": "4.75/5",
+          "final": "35/50",
+          "total_mark": "73.75/100",
+          "grade": "C"
+        }
+      },
+      "schedule": {
+        "Monday": {
+          "09:00 - 10:30": "M110 - Python Programming (Lecture)",
+          "11:00 - 12:30": "TM105 - Java Programming (Lecture)",
+          "14:00 - 15:30": "TM354 - Software Engineering (Lecture)"
+        },
+        "Tuesday": {
+          "09:00 - 10:30": "AR113 - Arabic Communication Skills (Lecture)",
+          "11:00 - 12:30": "M110 - Python Programming (Lab)",
+          "14:00 - 15:30": "TM354 - Software Engineering (Lab)"
+        },
+        "Wednesday": {
+          "09:00 - 10:30": "TM105 - Java Programming (Lab)",
+          "11:00 - 12:30": "TM354 - Software Engineering (Tutorial)",
+          "14:00 - 15:30": "AR113 - Arabic Communication Skills (Tutorial)"
+        },
+        "Thursday": {
+          "09:00 - 10:30": "M110 - Python Programming (Lab)",
+          "11:00 - 12:30": "TM105 - Java Programming (Seminar)",
+          "14:00 - 15:30": "TM354 - Software Engineering (Seminar)"
+        },
+        "Friday": {
+          "09:00 - 12:00": "Office Hours/Consultations",
+          "12:30 - 14:00": "Departmental Meeting"
+        }
+      },
+      "role": "student",
+      "email": "190370om@aou.edu.om"
+    },
+    {
+      "id": 101010,
+      "role": "tutor",
+      "name": "Mohammed Abrar",
+      "email": "fake.dr.abrar@gmail.com",
+      "email_app_password": "iloe gfvm jskg pgdb",
+      "password": "101010",
+      "department": "Software Engineering",
+      "subjects_taught": [
+        {
+          "TM355 - Software Engineering": {
+            "students_emails": [
+              "200304om@aou.edu.om",
+              "190370@aou.edu.om"
+            ]
+          }
+        },
+        {
+          "Java Programming": {
+            "students_emails": [
+              "200304om@aou.edu.om",
+              "190370@aou.edu.om"
+            ]
+          }
+        }
+      ],
+      "years_of_experience": 12,
+      "schedule": {
+        "Monday": {
+          "09:00 - 10:30": "TM355 - Software Engineering (Lecture)",
+          "11:00 - 12:30": "Java Programming (Lab)",
+          "14:00 - 15:30": "Data Structures (Lecture)"
+        },
+        "Tuesday": {
+          "09:00 - 10:30": "TM355 - Software Engineering (Lab)",
+          "11:00 - 12:30": "Java Programming (Lecture)",
+          "14:00 - 15:30": "Data Structures (Tutorial)"
+        },
+        "Wednesday": {
+          "09:00 - 10:30": "Research/Office Hours",
+          "11:00 - 12:30": "TM355 - Software Engineering (Tutorial)",
+          "14:00 - 15:30": "Data Structures (Lab)"
+        },
+        "Thursday": {
+          "09:00 - 10:30": "Java Programming (Lecture)",
+          "11:00 - 12:30": "TM355 - Software Engineering (Seminar)",
+          "14:00 - 15:30": "Data Structures (Seminar)"
+        },
+        "Friday": {
+          "09:00 - 12:00": "Office Hours/Consultations",
+          "12:30 - 14:00": "Departmental Meeting"
+        }
+      }
+    }
+  ]
+}

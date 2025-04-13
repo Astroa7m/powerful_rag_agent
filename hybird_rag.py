@@ -1,31 +1,42 @@
+import langchain
+from langchain.agents import AgentExecutor, create_tool_calling_agent
 from langchain_community.vectorstores import FAISS
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain.chains import RetrievalQA
-from langchain_groq import ChatGroq
+from langchain_core.chat_history import InMemoryChatMessageHistory
+from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
+from langchain_core.runnables import RunnableWithMessageHistory
+from langchain_core.tools import tool
 from langchain_community.utilities.sql_database import SQLDatabase
 from langchain_community.agent_toolkits.sql.toolkit import SQLDatabaseToolkit
-from langgraph.prebuilt import create_react_agent
 import sqlite3
-import re
+from langchain_community.chat_message_histories import ChatMessageHistory
+from langchain_groq import ChatGroq
+from langgraph.prebuilt import create_react_agent
+
+from util.funcs import extract_sql
 
 # === Load Embedding Model and LLM ===
 embedding_model = HuggingFaceEmbeddings(model_name="thenlper/gte-small")
 llm = ChatGroq(
     model_name="llama3-70b-8192",
     temperature=0,
-    groq_api_key="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"
+    groq_api_key="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",
+    streaming=True
 )
 
 # === Load Vectorstore for unstructured data ===
-vectorstore = FAISS.load_local("vector_store_faq_and_general_info/aou_faq_vectorstore", embedding_model, allow_dangerous_deserialization=True)
-retriever = vectorstore.as_retriever(search_type="similarity", search_kwargs={"k": 5})
+vectorstore = FAISS.load_local("vector_store_faq_and_general_info/aou_faq_vectorstore", embedding_model,
+                               allow_dangerous_deserialization=True)
+# retriever = vectorstore.as_retriever(search_type="similarity", search_kwargs={"k": 5})
+retriever = vectorstore.as_retriever()
 qa_chain = RetrievalQA.from_chain_type(
     llm=llm,
     retriever=retriever,
     chain_type="stuff",
     return_source_documents=False
 )
-system_prompt = """You are an expert SQL assistant that helps users query a university database.
+sql_system_prompt = """You are an expert SQL assistant that helps users query a university database.
 For the given database, analyze the user's question, create appropriate SQL queries, and provide clear answers.
 Always show your reasoning step by step.
 
@@ -166,30 +177,27 @@ When answering questions, you must:
 
 Be smart about schema usage and try to match intent, not just keywords.
 """
+
 # === Load SQL Subsystem ===
 db = SQLDatabase.from_uri("sqlite:///university.db")
 toolkit = SQLDatabaseToolkit(db=db, llm=llm)
 agent_executor = create_react_agent(
     model=llm,
     tools=toolkit.get_tools(),
-    state_modifier=system_prompt,
-    debug=True
+    state_modifier=sql_system_prompt,
+    # debug=True # turn on for sql debug
 )
 
 # === Load SQL example vectorstore ===
-sql_vectorstore = FAISS.load_local("vector_store_to_sql_gen/query_vector_index", embedding_model, allow_dangerous_deserialization=True)
+sql_vectorstore = FAISS.load_local("vector_store_to_sql_gen/query_vector_index", embedding_model,
+                                   allow_dangerous_deserialization=True)
+
 
 def build_prompt_with_top_k_sql(user_question, k=5):
     retrieved = sql_vectorstore.similarity_search(user_question, k=k)
     examples = "\n\n".join([f"Q: {doc.page_content}\nSQL: {doc.metadata['sql']}" for doc in retrieved])
     return f"{examples}\n\nUser Question: {user_question}\nSQL:"
 
-def extract_sql(text: str):
-    match = re.search(r"```sql(.*?)```", text, re.DOTALL | re.IGNORECASE)
-    if match:
-        return match.group(1).strip()
-    match = re.search(r"(SELECT\s+.*?;)", text, re.DOTALL | re.IGNORECASE)
-    return match.group(1).strip() if match else None
 
 def run_sql(sql_query: str):
     try:
@@ -203,17 +211,18 @@ def run_sql(sql_query: str):
     except Exception as e:
         return f"[SQL Error] {e}"
 
+
 def hybrid_combined_summary(question: str):
     print(f"\n💬 USER QUESTION: {question}\n")
 
     # 1. Run vector-based retrieval
-    vector_answer = qa_chain.run(question)
+    vector_answer = qa_chain.invoke(question)
 
     # 2. Run SQL generation + execution
     sql_prompt = build_prompt_with_top_k_sql(question)
     sql_response = agent_executor.invoke({"messages": [("user", sql_prompt)]})["messages"][-1].content
     sql_code = extract_sql(sql_response)
-    sql_output = run_sql(sql_code) if sql_code else "[No SQL extracted.]"
+    sql_output = run_sql(sql_code) if sql_code else sql_response
 
     # Debug outputs
     print("\n📚 VECTORSTORE RESULT:\n", vector_answer)
@@ -235,10 +244,73 @@ Please write a helpful, final answer for the user based on all this information.
     response = llm.invoke(final_prompt)
     return response.content
 
+
+@tool
+def university_info_retriever(question: str) -> str:
+    """Used when asked about information Only.
+    Retrieves university info using both vector store and SQL
+    :arg: question (user query)
+    :return: the answer to user query"""
+    return hybrid_combined_summary(question)
+
+
+@tool
+def general_chatting(question: str) -> str:
+    """Used for general chatting
+       :arg: question (user query)
+       :return: the answer to user query"""
+    return llm.invoke(question)
+
+
+memory = InMemoryChatMessageHistory(session_id="test-session")
+
+tools = [university_info_retriever, general_chatting]
+agent_prompt = ChatPromptTemplate.from_messages(
+    [
+        ("system", """You are an Arab Open University (AOU) expert providing information about various aspect with the university.
+Be as helpful as possible and return as much information as possible.
+Do not answer any questions that do not relate to AOU, studies, tutors, modules, etc
+
+Do not answer any questions using your pre-trained knowledge, only use the information provided in the context."""),
+        ("placeholder", "{chat_history}"),
+        ("human", "{input}"),
+        ("placeholder", "{agent_scratchpad}"),
+    ]
+)
+
+agent = create_tool_calling_agent(llm=llm, tools=tools, prompt=agent_prompt)
+
+agent_executor2 = AgentExecutor(
+    agent=agent,
+    tools=tools,
+    verbose=True,
+)
+
+agent_with_chat_history = RunnableWithMessageHistory(
+    agent_executor2,
+    # This is needed because in most real world scenarios, a session id is needed
+    # It isn't really used here because we are using a simple in memory ChatMessageHistory
+    lambda session_id: memory,
+    input_messages_key="input",
+    history_messages_key="chat_history",
+)
+config = {
+    "configurable": {"session_id": "test-session"},
+    "configurable_fields": {"stream": False},
+}
+
 # === Example Usage ===
 if __name__ == "__main__":
-    answer = hybrid_combined_summary("Who teaches the tutorial of M269?")
-    print("\n🤖 FINAL ANSWER:\n", answer)
-
-## TODO: Fix the database vector store queries
-## queries LIKE who is Ahmed Samir break it
+    while True:
+        query = input("Q: ")
+        if query == "bye":
+            print("Bye 👋")
+            break
+        # # === Adding user message to memory ===
+        # chat_history.add_user_message(query)
+        # # === Invoking the messages with history ===
+        # answer = hybrid_combined_summary('\n'.join(str(item) for item in chat_history.messages))
+        # # === Adding AI response to memory ===
+        # chat_history.add_ai_message(answer)
+        answer = agent_with_chat_history.invoke({"input": query}, config=config)
+        print("\n🤖 FINAL ANSWER:\n", answer)

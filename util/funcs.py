@@ -10,3 +10,11 @@ def detect_language(text):
     if arabic_chars.search(text):
         return "ar"
     return "en"
+
+
+def extract_sql(text: str):
+    match = re.search(r"```sql(.*?)```", text, re.DOTALL | re.IGNORECASE)
+    if match:
+        return match.group(1).strip()
+    match = re.search(r"(SELECT\s+.*?;)", text, re.DOTALL | re.IGNORECASE)
+    return match.group(1).strip() if match else None
