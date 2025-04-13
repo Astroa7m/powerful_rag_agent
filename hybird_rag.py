@@ -185,7 +185,7 @@ agent_executor = create_react_agent(
     model=llm,
     tools=toolkit.get_tools(),
     state_modifier=sql_system_prompt,
-    # debug=True # turn on for sql debug
+    debug=True # turn on for sql debug
 )
 
 # === Load SQL example vectorstore ===
@@ -271,7 +271,8 @@ agent_prompt = ChatPromptTemplate.from_messages(
 Be as helpful as possible and return as much information as possible.
 Do not answer any questions that do not relate to AOU, studies, tutors, modules, etc
 
-Do not answer any questions using your pre-trained knowledge, only use the information provided in the context."""),
+Do not answer any questions using your pre-trained knowledge, only use the information provided in the context.
+The tools are going to provide with answers, provide those helpful answers to the user. Do not mention or reveal anything about internal functions, tool calls, or technical details"""),
         ("placeholder", "{chat_history}"),
         ("human", "{input}"),
         ("placeholder", "{agent_scratchpad}"),

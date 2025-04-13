@@ -1,6 +1,6 @@
-from fake_auth.auth import authenticate_user
-from fake_auth.fake_api import get_user_profile
-from fake_auth.fake_memory import set_user_session
+from fake_data.auth import authenticate_user
+from fake_data.fake_api import get_user_profile
+from fake_data.fake_memory import set_user_session
 
 # Example: Login
 user_id = input("Enter ID: ")
