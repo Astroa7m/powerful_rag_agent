@@ -185,7 +185,7 @@ agent_executor = create_react_agent(
     model=llm,
     tools=toolkit.get_tools(),
     state_modifier=sql_system_prompt,
-    debug=True # turn on for sql debug
+    debug=True  # turn on for sql debug
 )
 
 # === Load SQL example vectorstore ===
@@ -251,7 +251,8 @@ def university_info_retriever(question: str) -> str:
     Retrieves university info using both vector store and SQL
     :arg: question (user query)
     :return: the answer to user query"""
-    return hybrid_combined_summary(question)
+    answer = hybrid_combined_summary(question)
+    return {"output": answer}
 
 
 @tool
@@ -259,7 +260,7 @@ def general_chatting(question: str) -> str:
     """Used for general chatting
        :arg: question (user query)
        :return: the answer to user query"""
-    return llm.invoke(question)
+    return {"output": llm.invoke(question)}
 
 
 memory = InMemoryChatMessageHistory(session_id="test-session")
@@ -272,7 +273,8 @@ Be as helpful as possible and return as much information as possible.
 Do not answer any questions that do not relate to AOU, studies, tutors, modules, etc
 
 Do not answer any questions using your pre-trained knowledge, only use the information provided in the context.
-The tools are going to provide with answers, provide those helpful answers to the user. Do not mention or reveal anything about internal functions, tool calls, or technical details"""),
+When a tool provides an answer, always use it directly as your final answer. Do not comment on it or reflect on how helpful it was. Do not thank the tool or the user for it.
+"""),
         ("placeholder", "{chat_history}"),
         ("human", "{input}"),
         ("placeholder", "{agent_scratchpad}"),
