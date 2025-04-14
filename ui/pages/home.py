@@ -40,8 +40,21 @@ if user_input:
         st.markdown(user_input)
 
     with st.chat_message("assistant"):
+        response_container = st.empty()
+        full_response = ""
+
         with st.spinner("Thinking..."):
-            response = agent_with_chat_history.invoke({"input": user_input}, config=config)
-            answer = response["output"] if isinstance(response, dict) and "output" in response else str(response)
-            st.markdown(answer)
-            st.session_state.chat_history.append({"role": "assistant", "content": answer})
+            for chunk in agent_with_chat_history.stream({"input": user_input}, config=config):
+                if isinstance(chunk, dict) and "output" in chunk:
+                    content = chunk["output"]
+                else:
+                    content = str(chunk)
+
+                # Optional: Skip tool invocation logs
+                if "Invoking:" in content:
+                    continue
+
+                full_response += content
+                response_container.markdown(full_response)
+
+        st.session_state.chat_history.append({"role": "assistant", "content": full_response})

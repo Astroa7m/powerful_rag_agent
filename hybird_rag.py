@@ -1,9 +1,12 @@
+from typing import Iterator
+
 import langchain
 from langchain.agents import AgentExecutor, create_tool_calling_agent
 from langchain_community.vectorstores import FAISS
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain.chains import RetrievalQA
 from langchain_core.chat_history import InMemoryChatMessageHistory
+from langchain_core.messages import BaseMessageChunk
 from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
 from langchain_core.runnables import RunnableWithMessageHistory
 from langchain_core.tools import tool
@@ -241,8 +244,8 @@ Second, retrieved from structured tabular data:
 
 Please write a helpful, final answer for the user based on all this information. Do not mention any source, SQL, database, tools, or technical terms.
 """
-    response = llm.invoke(final_prompt)
-    return response.content
+    response = llm.stream(final_prompt)
+    return response
 
 
 @tool
@@ -251,16 +254,18 @@ def university_info_retriever(question: str) -> str:
     Retrieves university info using both vector store and SQL
     :arg: question (user query)
     :return: the answer to user query"""
-    answer = hybrid_combined_summary(question)
-    return {"output": answer}
+    return "".join(chunk.content for chunk in hybrid_combined_summary(question))
 
 
 @tool
 def general_chatting(question: str) -> str:
-    """Used for general chatting
-       :arg: question (user query)
-       :return: the answer to user query"""
-    return {"output": llm.invoke(question)}
+    """Used for general chatting"""
+    chunks = []
+    for chunk in llm.stream(question):
+        if hasattr(chunk, "content") and chunk.content:
+            chunks.append(chunk.content)
+    return "".join(chunks)
+
 
 
 memory = InMemoryChatMessageHistory(session_id="test-session")
@@ -273,7 +278,10 @@ Be as helpful as possible and return as much information as possible.
 Do not answer any questions that do not relate to AOU, studies, tutors, modules, etc
 
 Do not answer any questions using your pre-trained knowledge, only use the information provided in the context.
-When a tool provides an answer, always use it directly as your final answer. Do not comment on it or reflect on how helpful it was. Do not thank the tool or the user for it.
+When a tool provides an answer, always use it directly as your final answer. Do not comment on it or reflect on how helpful it was.
+Each user question should be treated independently. 
+Do not assume the same tool should be used for follow-up questions.
+Re-evaluate the best tool for every user input based on its own meaning.
 """),
         ("placeholder", "{chat_history}"),
         ("human", "{input}"),
